@@ -1,23 +1,44 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SiteHeader } from "@/components/listing/SiteHeader";
+import { Hero } from "@/components/listing/Hero";
+import { VideoTour } from "@/components/listing/VideoTour";
+import { Gallery } from "@/components/listing/Gallery";
+import { Amenities } from "@/components/listing/Amenities";
+import { HostTrust } from "@/components/listing/HostTrust";
+import { Footer } from "@/components/listing/Footer";
+import { MobileActionBar } from "@/components/listing/MobileActionBar";
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const title = "Luxury 3-Bedroom Waterfront Duplex, Lekki Phase 1 | PrimeHaven Lagos";
+const description =
+  "Book a luxury waterfront short-let in Lekki Phase 1 — ₦150,000/night with 24/7 power, Starlink Wi-Fi, pool, gym and armed estate security. Reserve on WhatsApp.";
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="relative overflow-x-clip bg-background">
+      <SiteHeader />
+      <main>
+        <Hero />
+        <VideoTour />
+        <Gallery />
+        <Amenities />
+        <HostTrust />
+      </main>
+      <Footer />
+      <MobileActionBar />
     </div>
   );
 }

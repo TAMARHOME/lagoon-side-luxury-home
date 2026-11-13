@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules
+- All listing copy, prices, WhatsApp link and the video tour URL live in `src/config/listing.ts` so the owner edits one file.
+- Video tour source is auto-detected by `resolveVideoSource` in `src/lib/video-source.ts` (MP4 / YouTube / Instagram / TikTok); add new providers there, covered by `src/test/listing.test.ts`.
+- Page sections live in `src/components/listing/`; styling uses tokens/utilities in `src/styles.css` and `gold`/`goldOutline` Button variants, never raw colors.

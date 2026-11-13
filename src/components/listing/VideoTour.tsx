@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Clock, MonitorPlay, Play, Smartphone, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { listing } from "@/config/listing";
+import { useListing } from "./ListingContext";
 import { resolveVideoSource } from "@/lib/video-source";
 import { cn } from "@/lib/utils";
 import poster from "@/assets/video-poster.jpg";
@@ -11,10 +11,9 @@ import { WhatsAppIcon } from "./WhatsAppIcon";
 type Orientation = "wide" | "vertical";
 
 export function VideoTour() {
-  const source = resolveVideoSource(listing.videoTour.url);
-  const [orientation, setOrientation] = useState<Orientation>(
-    source.kind === "embed" && source.vertical ? "vertical" : "wide",
-  );
+  const listing = useListing();
+  const source = resolveVideoSource(listing.video.url);
+  const [orientation, setOrientation] = useState<Orientation>(listing.video.orientation);
   const [playing, setPlaying] = useState(false);
 
   return (
@@ -124,7 +123,7 @@ export function VideoTour() {
               />
               <span className="absolute inset-0 bg-overlay/35" />
               <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full glass border px-3 py-1.5 text-xs font-medium text-foreground md:left-6 md:top-6">
-                <Clock className="h-3.5 w-3.5 text-primary" /> {listing.videoTour.duration}
+                <Clock className="h-3.5 w-3.5 text-primary" /> {listing.video.duration}
               </span>
               <span className="absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 animate-pulse-gold items-center justify-center rounded-full bg-gold text-primary-foreground transition-transform duration-300 group-hover:scale-110 md:h-24 md:w-24">
                 <Play className="ml-1 h-8 w-8 fill-current md:h-9 md:w-9" />
@@ -134,7 +133,7 @@ export function VideoTour() {
         </div>
 
         <p className="mx-auto mt-6 max-w-xl text-center text-sm leading-relaxed text-muted-foreground md:text-base">
-          {listing.videoTour.caption}
+          {listing.video.caption}
         </p>
       </div>
     </section>

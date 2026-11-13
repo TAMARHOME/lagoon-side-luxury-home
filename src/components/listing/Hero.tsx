@@ -1,16 +1,17 @@
+import { Fragment } from "react";
 import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { listing } from "@/config/listing";
-import heroImg from "@/assets/hero-duplex.jpg";
+import { useListing } from "./ListingContext";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export function Hero() {
-  const features = listing.subtitle.split(" • ");
+  const listing = useListing();
+  const features = listing.features;
   return (
     <section id="top" className="relative flex min-h-[100svh] items-end overflow-hidden">
       <img
-        src={heroImg}
-        alt="Luxury waterfront duplex in Lekki Phase 1 at dusk with infinity pool"
+        src={listing.imageSrc.hero}
+        alt={`${listing.plainTitle} in ${listing.location}`}
         width={1920}
         height={1088}
         fetchPriority="high"
@@ -25,16 +26,24 @@ export function Hero() {
         </span>
 
         <h1 className="mt-6 max-w-4xl animate-rise font-display text-[2.9rem] font-medium leading-[0.95] text-foreground [animation-delay:120ms] sm:text-6xl md:text-7xl lg:text-8xl">
-          Luxury 3-Bedroom <span className="italic text-gold">Waterfront</span> Duplex
+          {listing.titleParts.map((p, i) =>
+            p.gold ? (
+              <span key={i} className="italic text-gold">
+                {p.text}
+              </span>
+            ) : (
+              <Fragment key={i}>{p.text}</Fragment>
+            ),
+          )}
         </h1>
 
-        <p className="sr-only">{listing.subtitle}</p>
+        <p className="sr-only">{features.join(" • ")}</p>
         <ul
           aria-hidden="true"
           className="mt-6 flex max-w-3xl animate-rise flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground/85 [animation-delay:240ms] md:text-base"
         >
           {features.map((f, i) => (
-            <li key={f} className="flex items-center gap-4">
+            <li key={`${i}-${f}`} className="flex items-center gap-4">
               {i > 0 && <span className="h-1 w-1 rounded-full bg-primary" />}
               <span className={i === 0 ? "font-semibold text-primary" : undefined}>{f}</span>
             </li>

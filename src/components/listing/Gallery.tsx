@@ -1,25 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Expand, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import living from "@/assets/gallery-living.jpg";
-import bedroom from "@/assets/gallery-bedroom.jpg";
-import kitchen from "@/assets/gallery-kitchen.jpg";
-import pool from "@/assets/gallery-pool.jpg";
+import type { ImageSlot } from "@/lib/listing-content";
+import { useListing } from "./ListingContext";
 import { SectionHeading } from "./SectionHeading";
 
-const photos = [
-  { src: living, w: 1280, h: 960, label: "Living Room", alt: "Double-height living room with lagoon view", cls: "col-span-2 aspect-[4/3] md:aspect-auto md:col-span-2 md:row-span-2" },
-  { src: bedroom, w: 1024, h: 1280, label: "Master Bedroom", alt: "Master bedroom with king bed and city view", cls: "row-span-2 md:row-span-2" },
-  { src: kitchen, w: 1280, h: 960, label: "Fitted Kitchen", alt: "Black fitted kitchen with marble island", cls: "aspect-square md:aspect-auto" },
-  { src: pool, w: 1280, h: 960, label: "Swimming Pool", alt: "Infinity pool at sunset overlooking the lagoon", cls: "aspect-square md:aspect-auto" },
+const PHOTO_SLOTS: { slot: ImageSlot; w: number; h: number; label: string; alt: string; cls: string }[] = [
+  { slot: "living", w: 1280, h: 960, label: "Living Room", alt: "Double-height living room with lagoon view", cls: "col-span-2 aspect-[4/3] md:aspect-auto md:col-span-2 md:row-span-2" },
+  { slot: "bedroom", w: 1024, h: 1280, label: "Master Bedroom", alt: "Master bedroom with king bed and city view", cls: "row-span-2 md:row-span-2" },
+  { slot: "kitchen", w: 1280, h: 960, label: "Fitted Kitchen", alt: "Black fitted kitchen with marble island", cls: "aspect-square md:aspect-auto" },
+  { slot: "pool", w: 1280, h: 960, label: "Swimming Pool", alt: "Infinity pool at sunset overlooking the lagoon", cls: "aspect-square md:aspect-auto" },
 ];
 
 export function Gallery() {
+  const { imageSrc } = useListing();
+  const photos = PHOTO_SLOTS.map((p) => ({ ...p, src: imageSrc[p.slot] }));
   const [open, setOpen] = useState<number | null>(null);
   const close = useCallback(() => setOpen(null), []);
   const step = useCallback(
     (d: number) => setOpen((i) => (i === null ? i : (i + d + photos.length) % photos.length)),
-    [],
+    [photos.length],
   );
 
   useEffect(() => {

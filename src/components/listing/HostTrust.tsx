@@ -1,7 +1,6 @@
 import { BadgeCheck, Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { listing } from "@/config/listing";
-import agent from "@/assets/agent-portrait.jpg";
+import { useListing } from "./ListingContext";
 import { SectionHeading } from "./SectionHeading";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
@@ -16,6 +15,7 @@ function Stars() {
 }
 
 export function HostTrust() {
+  const listing = useListing();
   const { agency, testimonials } = listing;
   return (
     <section id="host" className="px-5 py-20 md:px-10 md:py-28">
@@ -26,7 +26,7 @@ export function HostTrust() {
           <div className="overflow-hidden rounded-3xl border border-border bg-card-gradient shadow-card lg:col-span-3">
             <div className="grid sm:grid-cols-5">
               <div className="relative aspect-[4/5] sm:col-span-2 sm:aspect-auto">
-                <img src={agent} alt={`${agency.agent}, ${agency.role}`} loading="lazy" width={768} height={960} className="absolute inset-0 h-full w-full object-cover object-top" />
+                <img src={listing.imageSrc.agent} alt={`${agency.agent}, ${agency.role}`} loading="lazy" width={768} height={960} className="absolute inset-0 h-full w-full object-cover object-top" />
               </div>
               <div className="flex flex-col justify-between gap-8 p-6 sm:col-span-3 md:p-10">
                 <div>

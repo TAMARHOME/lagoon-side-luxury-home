@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { listing } from "@/config/listing";
+import { useListing } from "./ListingContext";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
 export function SiteHeader() {
+  const listing = useListing();
   return (
     <header className="absolute inset-x-0 top-0 z-30">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 md:px-10 md:py-7">

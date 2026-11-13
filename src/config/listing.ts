@@ -1,35 +1,41 @@
 /**
- * Listing content — edit this file to update the page.
- *
- * VIDEO TOUR: paste ONE link into `videoTour.url` and the player switches automatically.
- *   - MP4 file:   put the file in /public/videos/ and use "/videos/tour.mp4"
- *   - YouTube:    "https://www.youtube.com/watch?v=XXXX" or "https://youtu.be/XXXX" or a /shorts/ link
- *   - Instagram:  "https://www.instagram.com/reel/XXXX/"
- *   - TikTok:     "https://www.tiktok.com/@handle/video/1234567890"
- * Leave it empty ("") to show the "request a live video call" fallback.
+ * Default listing content. The owner normally edits these through /admin
+ * (saved online); these values are only used until something is saved there,
+ * or for any field that was never changed.
  */
-const WHATSAPP_NUMBER = "2348000000000";
-const WHATSAPP_MESSAGE = "Hello, I am interested in the Lekki Phase 1 Duplex";
+import type { ListingContent } from "@/lib/listing-content";
 
-export const listing = {
+/** Pre-filled WhatsApp message sent with every booking enquiry. */
+export const WHATSAPP_MESSAGE = "Hello, I am interested in the Lekki Phase 1 Duplex";
+
+export const defaultContent: ListingContent = {
+  // Wrap a word in *stars* to show it in gold italics.
+  title: "Luxury 3-Bedroom *Waterfront* Duplex",
   badge: "EXCLUSIVE LISTING • LEKKI PHASE 1",
-  title: "Luxury 3-Bedroom Waterfront Duplex",
-  subtitle: "₦150,000 / Night • 24/7 Power • Starlink Wi-Fi • Armed Estate Security",
-  priceLabel: "₦150,000",
-  priceUnit: "/ night",
+  price: "₦150,000 / night",
+  specs: "24/7 Power • Starlink Wi-Fi • Armed Estate Security",
   location: "Lekki Phase 1, Lagos",
-  whatsappUrl: `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE.split(" ").join("%20")}`,
-  videoTour: {
+  whatsappNumber: "2348000000000",
+  video: {
+    // MP4 link, YouTube, Instagram Reel or TikTok. Empty = "request a live video call" card.
     url: "",
+    orientation: "wide",
     duration: "01:45 HD Tour",
-    caption:
-      "Take a 2-minute virtual walkthrough of the interior, compound, and neighborhood",
   },
+  agent: {
+    name: "Adaeze Okafor",
+    bio: "Trusted luxury short-let and property specialists in Lekki & Victoria Island",
+  },
+  // null = use the original photo that ships with the site.
+  images: { hero: null, living: null, bedroom: null, kitchen: null, pool: null, agent: null },
+};
+
+/** Content that is not editable from /admin. */
+export const staticListing = {
+  videoCaption: "Take a 2-minute virtual walkthrough of the interior, compound, and neighborhood",
   agency: {
     name: "PrimeHaven Properties Lagos",
-    agent: "Adaeze Okafor",
     role: "Lead Property Consultant",
-    bio: "Trusted luxury short-let and property specialists in Lekki & Victoria Island",
     stats: [
       { value: "120+", label: "Luxury stays hosted" },
       { value: "4.9", label: "Guest rating" },

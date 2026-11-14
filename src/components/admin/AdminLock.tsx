@@ -53,7 +53,7 @@ export function AdminLock() {
         <h1 className="mt-3 font-display text-4xl text-foreground">
           Prime<span className="italic text-gold">Haven</span>
         </h1>
-        <p className="mt-3 text-sm text-muted-foreground">Enter your PIN to edit the listing page.</p>
+        <p className="mt-3 text-sm text-muted-foreground">Enter your PIN to manage your properties.</p>
 
         <label htmlFor="pin" className="sr-only">
           PIN
@@ -80,7 +80,7 @@ export function AdminLock() {
         </Button>
 
         <Link to="/" className="mt-6 inline-flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-primary">
-          <ArrowLeft className="h-3.5 w-3.5" /> Back to listing
+          <ArrowLeft className="h-3.5 w-3.5" /> Back to website
         </Link>
       </form>
     </div>

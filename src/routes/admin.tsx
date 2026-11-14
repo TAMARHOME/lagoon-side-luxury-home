@@ -15,10 +15,10 @@ export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
       { title: "Owner Dashboard · PrimeHaven Properties Lagos" },
-      { name: "description", content: "Private owner dashboard for editing the PrimeHaven listing page." },
+      { name: "description", content: "Private owner dashboard for managing PrimeHaven properties and agent details." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Owner Dashboard · PrimeHaven Properties Lagos" },
-      { property: "og:description", content: "Private owner dashboard for editing the PrimeHaven listing page." },
+      { property: "og:description", content: "Private owner dashboard for managing PrimeHaven properties and agent details." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

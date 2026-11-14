@@ -1,24 +1,38 @@
 import { describe, expect, it } from "vitest";
 import { defaultContent } from "@/config/listing";
-import { buildWhatsAppUrl, mergeContent, parseTitle, resolveListing, splitPrice } from "@/lib/listing-content";
+import {
+  buildBookingMessage,
+  buildWhatsAppUrl,
+  filterProperties,
+  getFeatured,
+  interestMessage,
+  mergeContent,
+  parseTitle,
+  splitPrice,
+} from "@/lib/listing-content";
 import { DEFAULT_ADMIN_PIN, pinMatches } from "@/lib/admin-pin.server";
 import { resolveVideoSource } from "@/lib/video-source";
 
 describe("listing booking rules", () => {
-  const listing = resolveListing(defaultContent);
+  const featured = getFeatured(defaultContent);
 
-  it("sends bookings to the requested WhatsApp link", () => {
-    expect(listing.whatsappUrl).toBe(
-      "https://wa.me/2348000000000?text=Hello,%20I%20am%20interested%20in%20the%20Lekki%20Phase%201%20Duplex",
+  it("features the Lekki duplex at ₦150,000 / night by default", () => {
+    expect(featured.id).toBe("lekki-waterfront-duplex");
+    expect(splitPrice(featured.price)).toEqual({ label: "₦150,000", unit: "/ night" });
+  });
+
+  it("pre-fills WhatsApp with that specific property's name", () => {
+    expect(buildWhatsAppUrl("2348000000000", interestMessage("Penthouse *Skyline* Apartment"))).toBe(
+      "https://wa.me/2348000000000?text=Hello%2C%20I%20am%20interested%20in%20the%20Penthouse%20Skyline%20Apartment",
     );
   });
 
-  it("shows the nightly rate as ₦150,000", () => {
-    expect(listing.priceLabel).toBe("₦150,000");
-  });
-
-  it("uses the owner's new WhatsApp number in every booking link", () => {
-    expect(buildWhatsAppUrl("2348012345678")).toMatch(/^https:\/\/wa\.me\/2348012345678\?text=/);
+  it("booking popup message includes title, price, date and visit type", () => {
+    expect(
+      buildBookingMessage({ title: "Luxury *Waterfront* Duplex", price: "₦150,000 / night", date: "2026-11-21", visitType: "Short-Let Booking" }),
+    ).toBe(
+      "Hello, I would like to book the Luxury Waterfront Duplex.\nPrice: ₦150,000 / night\nPreferred date: Sat, 21 Nov 2026\nVisit type: Short-Let Booking",
+    );
   });
 
   it("shows a sale price with no per-night unit", () => {
@@ -34,21 +48,39 @@ describe("listing booking rules", () => {
   });
 });
 
+describe("category & area filters", () => {
+  const list = defaultContent.properties;
+  it("“Short-Lets” shows only short-lets", () => {
+    expect(filterProperties(list, { category: "short-let", area: null }).every((p) => p.category === "short-let")).toBe(true);
+  });
+  it("“For Sale” shows only homes for sale", () => {
+    expect(filterProperties(list, { category: "sale", area: null }).map((p) => p.id)).toEqual(["banana-island-mansion"]);
+  });
+  it("area filter matches the first part of the location", () => {
+    expect(filterProperties(list, { category: "all", area: "Victoria Island" }).map((p) => p.id)).toEqual(["vi-skyline-penthouse"]);
+  });
+});
+
 describe("saved admin content", () => {
   it("keeps defaults for anything never saved", () => {
     expect(mergeContent(null)).toEqual(defaultContent);
   });
 
-  it("applies saved edits and ignores invalid ones", () => {
-    const merged = mergeContent({ price: "₦200,000 / night", whatsappNumber: "not-a-number", agent: { name: "Tife" } });
-    expect(merged.price).toBe("₦200,000 / night");
-    expect(merged.whatsappNumber).toBe(defaultContent.whatsappNumber);
-    expect(merged.agent).toEqual({ name: "Tife", bio: defaultContent.agent.bio });
+  it("keeps the default WhatsApp number when a saved one is invalid", () => {
+    const merged = mergeContent({ agent: { name: "Tife", whatsappNumber: "not-a-number" } });
+    expect(merged.agent.name).toBe("Tife");
+    expect(merged.agent.whatsappNumber).toBe(defaultContent.agent.whatsappNumber);
   });
 
-  it("rejects photo links that are not https or uploaded photos", () => {
-    const merged = mergeContent({ images: { ...defaultContent.images, hero: "javascript:alert(1)" } });
-    expect(merged.images.hero).toBeNull();
+  it("skips saved properties with unsafe photo links", () => {
+    const good = defaultContent.properties[0]!;
+    const merged = mergeContent({ properties: [{ ...good, id: "bad", cover: "javascript:alert(1)" }, good] });
+    expect(merged.properties.map((p) => p.id)).toEqual([good.id]);
+  });
+
+  it("falls back to the first property when the featured one was deleted", () => {
+    const [a, b] = defaultContent.properties;
+    expect(mergeContent({ featuredId: "gone", properties: [b, a] }).featuredId).toBe(b!.id);
   });
 });
 

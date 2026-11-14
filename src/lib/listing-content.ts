@@ -179,6 +179,8 @@ export function buildWhatsAppUrl(number: string, message: string): string {
   return `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 }
 
+export const GENERAL_ENQUIRY_MESSAGE = "Hello, I am interested in your Lagos properties";
+
 export const interestMessage = (title: string) => `Hello, I am interested in the ${plainTitle(title)}`;
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

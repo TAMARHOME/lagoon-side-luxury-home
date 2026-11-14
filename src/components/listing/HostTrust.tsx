@@ -1,6 +1,7 @@
 import { BadgeCheck, Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useListing } from "./ListingContext";
+import { staticListing } from "@/config/listing";
+import { useSite } from "./ListingContext";
 import { SectionHeading } from "./SectionHeading";
 import { WhatsAppIcon } from "./WhatsAppIcon";
 
@@ -15,8 +16,8 @@ function Stars() {
 }
 
 export function HostTrust() {
-  const listing = useListing();
-  const { agency, testimonials } = listing;
+  const { agent } = useSite();
+  const { stats, testimonials, agentRole } = staticListing;
   return (
     <section id="host" className="px-5 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
@@ -26,23 +27,23 @@ export function HostTrust() {
           <div className="overflow-hidden rounded-3xl border border-border bg-card-gradient shadow-card lg:col-span-3">
             <div className="grid sm:grid-cols-5">
               <div className="relative aspect-[4/5] sm:col-span-2 sm:aspect-auto">
-                <img src={listing.imageSrc.agent} alt={`${agency.agent}, ${agency.role}`} loading="lazy" width={768} height={960} className="absolute inset-0 h-full w-full object-cover object-top" />
+                <img src={agent.photoSrc} alt={`${agent.name}, ${agentRole}`} loading="lazy" width={768} height={960} className="absolute inset-0 h-full w-full object-cover object-top" />
               </div>
               <div className="flex flex-col justify-between gap-8 p-6 sm:col-span-3 md:p-10">
                 <div>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-[0.65rem] font-bold tracking-[0.2em] text-primary-foreground">
                     <BadgeCheck className="h-3.5 w-3.5" /> VERIFIED HOST
                   </span>
-                  <h3 className="mt-5 font-display text-3xl text-foreground md:text-4xl">{agency.name}</h3>
+                  <h3 className="mt-5 font-display text-3xl text-foreground md:text-4xl">{agent.agencyName}</h3>
                   <p className="mt-1 text-sm text-primary">
-                    {agency.agent} · {agency.role}
+                    {agent.name} · {agentRole}
                   </p>
-                  <p className="mt-4 leading-relaxed text-muted-foreground">{agency.bio}</p>
+                  <p className="mt-4 leading-relaxed text-muted-foreground">{agent.bio}</p>
                 </div>
                 <div>
                   <div className="gold-rule" />
                   <dl className="mt-6 grid grid-cols-3 gap-4">
-                    {agency.stats.map((s) => (
+                    {stats.map((s) => (
                       <div key={s.label}>
                         <dt className="sr-only">{s.label}</dt>
                         <dd className="font-display text-3xl text-gold">{s.value}</dd>
@@ -51,8 +52,8 @@ export function HostTrust() {
                     ))}
                   </dl>
                   <Button asChild variant="goldOutline" size="pill" className="mt-8">
-                    <a href={listing.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                      <WhatsAppIcon /> Message {agency.agent.split(" ")[0]}
+                    <a href={agent.enquiryUrl} target="_blank" rel="noopener noreferrer">
+                      <WhatsAppIcon /> Message {agent.firstName}
                     </a>
                   </Button>
                 </div>

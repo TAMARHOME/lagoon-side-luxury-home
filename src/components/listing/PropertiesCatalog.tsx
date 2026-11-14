@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { filterProperties, listAreas, type CategoryFilter } from "@/lib/listing-content";
 import { cn } from "@/lib/utils";
 import { useSite } from "./ListingContext";
@@ -11,7 +11,7 @@ const CATEGORY_PILLS: { id: CategoryFilter; label: string }[] = [
   { id: "sale", label: "For Sale" },
 ];
 
-function Pill({ active, onClick, children, small }: { active: boolean; onClick: () => void; children: React.ReactNode; small?: boolean }) {
+function Pill({ active, onClick, children, small }: { active: boolean; onClick: () => void; children: ReactNode; small?: boolean }) {
   return (
     <button
       type="button"

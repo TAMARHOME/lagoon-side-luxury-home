@@ -16,6 +16,7 @@ import {
   STATUS_LABELS,
   amenityInfo,
   buildWhatsAppUrl,
+  GENERAL_ENQUIRY_MESSAGE,
   interestMessage,
   parseTitle,
   plainTitle,
@@ -74,6 +75,11 @@ export function resolveProperty(p: Property, whatsappNumber: string) {
 export type ResolvedProperty = ReturnType<typeof resolveProperty>;
 
 export function resolveAgent(a: Agent) {
-  return { ...a, photoSrc: resolveImage(a.photo) ?? DEFAULT_AGENT_PHOTO, firstName: a.name.split(" ")[0] ?? a.name };
+  return {
+    ...a,
+    photoSrc: resolveImage(a.photo) ?? DEFAULT_AGENT_PHOTO,
+    firstName: a.name.split(" ")[0] ?? a.name,
+    enquiryUrl: buildWhatsAppUrl(a.whatsappNumber, GENERAL_ENQUIRY_MESSAGE),
+  };
 }
 export type ResolvedAgent = ReturnType<typeof resolveAgent>;

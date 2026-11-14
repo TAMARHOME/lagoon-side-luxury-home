@@ -1,47 +1,97 @@
 /**
- * Default listing content. The owner normally edits these through /admin
- * (saved online); these values are only used until something is saved there,
- * or for any field that was never changed.
+ * Default site content. The owner normally edits everything through /admin
+ * (saved online); these values are only used until something is saved there.
+ * Photos written as "asset:<name>" are the ones that ship with the site
+ * (see src/lib/listing-assets.ts).
  */
-import type { ListingContent } from "@/lib/listing-content";
+import type { SiteContent } from "@/lib/listing-content";
 
-/** Pre-filled WhatsApp message sent with every booking enquiry. */
-export const WHATSAPP_MESSAGE = "Hello, I am interested in the Lekki Phase 1 Duplex";
-
-export const defaultContent: ListingContent = {
-  // Wrap a word in *stars* to show it in gold italics.
-  title: "Luxury 3-Bedroom *Waterfront* Duplex",
-  badge: "EXCLUSIVE LISTING • LEKKI PHASE 1",
-  price: "₦150,000 / night",
-  specs: "24/7 Power • Starlink Wi-Fi • Armed Estate Security",
-  location: "Lekki Phase 1, Lagos",
-  whatsappNumber: "2348000000000",
-  video: {
-    // MP4 link, YouTube, Instagram Reel or TikTok. Empty = "request a live video call" card.
-    url: "",
-    orientation: "wide",
-    duration: "01:45 HD Tour",
-  },
+export const defaultContent: SiteContent = {
   agent: {
+    agencyName: "PrimeHaven Properties Lagos",
     name: "Adaeze Okafor",
     bio: "Trusted luxury short-let and property specialists in Lekki & Victoria Island",
+    whatsappNumber: "2348000000000",
+    photo: null,
   },
-  // null = use the original photo that ships with the site.
-  images: { hero: null, living: null, bedroom: null, kitchen: null, pool: null, agent: null },
+  featuredId: "lekki-waterfront-duplex",
+  properties: [
+    {
+      id: "lekki-waterfront-duplex",
+      // Wrap a word in *stars* to show it in gold italics.
+      title: "Luxury 3-Bedroom *Waterfront* Duplex",
+      location: "Lekki Phase 1, Lagos",
+      price: "₦150,000 / night",
+      category: "short-let",
+      status: "available",
+      video: { url: "", orientation: "wide", duration: "01:45 HD Tour" },
+      cover: "asset:hero",
+      gallery: [
+        { url: "asset:living", label: "Living Room" },
+        { url: "asset:bedroom", label: "Master Bedroom" },
+        { url: "asset:kitchen", label: "Fitted Kitchen" },
+        { url: "asset:pool", label: "Swimming Pool" },
+      ],
+      amenities: ["power", "wifi", "security", "pool", "gym", "parking", "waterfront"],
+      description:
+        "A double-height waterfront duplex with three en-suite bedrooms, a private pool deck and lagoon views — moments from Lekki's best restaurants.",
+      landmarks: ["5 mins from Admiralty Way", "10 mins from Lekki Toll Gate"],
+    },
+    {
+      id: "vi-skyline-penthouse",
+      title: "Penthouse *Skyline* Apartment",
+      location: "Victoria Island, Lagos",
+      price: "₦220,000 / night",
+      category: "short-let",
+      status: "new",
+      video: { url: "", orientation: "wide", duration: "01:30 HD Tour" },
+      cover: "asset:penthouse-cover",
+      gallery: [{ url: "asset:penthouse-bedroom", label: "Master Suite" }],
+      amenities: ["power", "wifi", "security", "gym", "ac", "tv", "waterfront"],
+      description: "A top-floor penthouse with floor-to-ceiling ocean views, marble finishes and a private lift lobby.",
+      landmarks: ["3 mins from Eko Atlantic", "5 mins from Adeola Odeku"],
+    },
+    {
+      id: "banana-island-mansion",
+      title: "5-Bedroom *Detached* Mansion",
+      location: "Banana Island, Ikoyi",
+      price: "₦1,200,000,000",
+      category: "sale",
+      status: "available",
+      video: { url: "", orientation: "wide", duration: "02:00 HD Tour" },
+      cover: "asset:mansion-cover",
+      gallery: [{ url: "asset:mansion-living", label: "Grand Living Room" }],
+      amenities: ["power", "security", "pool", "parking", "staff", "kitchen"],
+      description:
+        "A newly built detached mansion on a quiet Banana Island close, with a pool, cinema room and two-room staff quarters. Certificate of Occupancy available.",
+      landmarks: ["2 mins from Banana Island Gate", "10 mins from Ikoyi Club"],
+    },
+    {
+      id: "ikoyi-serviced-apartment",
+      title: "2-Bedroom *Serviced* Apartment",
+      location: "Old Ikoyi, Lagos",
+      price: "₦95,000 / night",
+      category: "short-let",
+      status: "booked",
+      video: { url: "", orientation: "wide", duration: "01:15 HD Tour" },
+      cover: "asset:serviced-cover",
+      gallery: [{ url: "asset:serviced-kitchen", label: "Kitchen" }],
+      amenities: ["power", "wifi", "security", "ac", "kitchen", "tv", "housekeeping"],
+      description: "A calm, fully serviced apartment with daily housekeeping — ideal for business stays.",
+      landmarks: ["5 mins from Falomo Bridge"],
+    },
+  ],
 };
 
 /** Content that is not editable from /admin. */
 export const staticListing = {
   videoCaption: "Take a 2-minute virtual walkthrough of the interior, compound, and neighborhood",
-  agency: {
-    name: "PrimeHaven Properties Lagos",
-    role: "Lead Property Consultant",
-    stats: [
-      { value: "120+", label: "Luxury stays hosted" },
-      { value: "4.9", label: "Guest rating" },
-      { value: "8 yrs", label: "In Lagos real estate" },
-    ],
-  },
+  agentRole: "Lead Property Consultant",
+  stats: [
+    { value: "120+", label: "Luxury stays hosted" },
+    { value: "4.9", label: "Guest rating" },
+    { value: "8 yrs", label: "In Lagos real estate" },
+  ],
   testimonials: [
     {
       quote:

@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
-import { IMAGE_SLOTS, MEDIA_BUCKET, MEDIA_PREFIX, listingContentSchema, mergeContent } from "./listing-content";
+import { MEDIA_BUCKET, MEDIA_PREFIX, mergeContent, siteContentSchema } from "./listing-content";
 import { pinMatches } from "./admin-pin.server";
 import { clientKey, getAdminSession, isAdminUnlocked, requireAdmin } from "./admin-session.server";
 
@@ -69,7 +69,7 @@ export const lockAdmin = createServerFn({ method: "POST" }).handler(async () => 
 });
 
 export const saveSiteContent = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => listingContentSchema.parse(input))
+  .inputValidator((input: unknown) => siteContentSchema.parse(input))
   .handler(async ({ data }) => {
     await requireAdmin();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -90,7 +90,7 @@ export const createImageUpload = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
-        slot: z.enum(IMAGE_SLOTS),
+        kind: z.enum(["property", "agent"]),
         contentType: z.enum(Object.keys(IMAGE_TYPES) as [keyof typeof IMAGE_TYPES, ...(keyof typeof IMAGE_TYPES)[]]),
       })
       .parse(input),
@@ -98,7 +98,8 @@ export const createImageUpload = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdmin();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const path = `${data.slot}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${IMAGE_TYPES[data.contentType]}`;
+    const folder = data.kind === "agent" ? "agent" : "properties";
+    const path = `${folder}/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${IMAGE_TYPES[data.contentType]}`;
     const { data: signed, error } = await supabaseAdmin.storage.from(MEDIA_BUCKET).createSignedUploadUrl(path);
     if (error || !signed) {
       console.error("createImageUpload failed", error);

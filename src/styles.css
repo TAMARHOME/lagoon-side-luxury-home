@@ -124,6 +124,41 @@
   --shadow-gold: 0 0 0 1px oklch(0.86 0.12 92 / 40%), 0 10px 40px -8px oklch(0.767 0.139 91.1 / 55%);
   --shadow-gold-strong: 0 0 0 1px oklch(0.86 0.12 92 / 60%), 0 14px 60px -6px oklch(0.767 0.139 91.1 / 75%);
   --shadow-card: 0 30px 60px -30px oklch(0 0 0 / 80%);
+  --glass: oklch(0.168 0 0 / 72%);
+  --glass-border: oklch(1 0 0 / 10%);
+}
+
+/* Warm Ivory & Gold daytime mode (visitor toggle in the header) */
+html.light {
+  --background: oklch(0.972 0.012 85);
+  --foreground: oklch(0.2 0.012 70);
+  --card: oklch(0.99 0.006 85);
+  --card-foreground: oklch(0.2 0.012 70);
+  --popover: oklch(0.99 0.006 85);
+  --popover-foreground: oklch(0.2 0.012 70);
+  --primary: oklch(0.6 0.12 80);
+  --primary-glow: oklch(0.74 0.13 88);
+  --primary-foreground: oklch(0.18 0.012 70);
+  --secondary: oklch(0.935 0.015 85);
+  --secondary-foreground: oklch(0.2 0.012 70);
+  --muted: oklch(0.935 0.015 85);
+  --muted-foreground: oklch(0.45 0.015 70);
+  --accent: oklch(0.93 0.035 88);
+  --accent-foreground: oklch(0.45 0.09 80);
+  --border: oklch(0.25 0.03 70 / 12%);
+  --border-gold: oklch(0.6 0.12 80 / 40%);
+  --input: oklch(0.25 0.03 70 / 18%);
+  --ring: oklch(0.6 0.12 80);
+  --overlay: oklch(0.972 0.012 85);
+  --gradient-gold: linear-gradient(135deg, oklch(0.8 0.12 90) 0%, oklch(0.7 0.13 84) 50%, oklch(0.62 0.12 78) 100%);
+  --gradient-hero: linear-gradient(180deg, oklch(0.972 0.012 85 / 70%) 0%, oklch(0.972 0.012 85 / 15%) 35%, oklch(0.972 0.012 85 / 88%) 75%, oklch(0.972 0.012 85) 100%);
+  --gradient-card: linear-gradient(160deg, oklch(0.995 0.005 85) 0%, oklch(0.965 0.012 85) 100%);
+  --shadow-gold: 0 0 0 1px oklch(0.7 0.13 84 / 45%), 0 10px 30px -10px oklch(0.6 0.12 80 / 45%);
+  --shadow-gold-strong: 0 0 0 1px oklch(0.7 0.13 84 / 65%), 0 14px 44px -8px oklch(0.6 0.12 80 / 60%);
+  --shadow-card: 0 30px 60px -30px oklch(0.35 0.04 70 / 28%);
+  --glass: oklch(0.972 0.012 85 / 80%);
+  --glass-border: oklch(0.25 0.03 70 / 10%);
+  color-scheme: light;
 }
 
 @layer base {
@@ -133,6 +168,10 @@
 
   html {
     scroll-behavior: smooth;
+  }
+
+  html {
+    color-scheme: dark;
   }
 
   body {
@@ -193,9 +232,9 @@
 }
 
 @utility glass {
-  background: oklch(0.168 0 0 / 72%);
+  background: var(--glass);
   backdrop-filter: blur(18px) saturate(160%);
-  border-color: oklch(1 0 0 / 10%);
+  border-color: var(--glass-border);
 }
 
 @utility gold-rule {

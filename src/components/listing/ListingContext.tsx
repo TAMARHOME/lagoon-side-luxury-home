@@ -1,39 +1,43 @@
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import heroImg from "@/assets/hero-duplex.jpg";
-import living from "@/assets/gallery-living.jpg";
-import bedroom from "@/assets/gallery-bedroom.jpg";
-import kitchen from "@/assets/gallery-kitchen.jpg";
-import pool from "@/assets/gallery-pool.jpg";
-import agent from "@/assets/agent-portrait.jpg";
-import { resolveListing, type ImageSlot, type ListingContent, type ResolvedListing } from "@/lib/listing-content";
+import { getFeatured, type SiteContent } from "@/lib/listing-content";
+import { resolveAgent, resolveProperty, type ResolvedAgent, type ResolvedProperty } from "@/lib/listing-assets";
 
-/** Original photos shipped with the site, used until the owner uploads a replacement. */
-export const DEFAULT_IMAGES: Record<ImageSlot, string> = { hero: heroImg, living, bedroom, kitchen, pool, agent };
+type SiteValue = {
+  content: SiteContent;
+  agent: ResolvedAgent;
+  properties: ResolvedProperty[];
+  featured: ResolvedProperty;
+  openProperty: (id: string) => void;
+};
 
-export function resolveImages(images: ListingContent["images"]): Record<ImageSlot, string> {
-  return {
-    hero: images.hero ?? DEFAULT_IMAGES.hero,
-    living: images.living ?? DEFAULT_IMAGES.living,
-    bedroom: images.bedroom ?? DEFAULT_IMAGES.bedroom,
-    kitchen: images.kitchen ?? DEFAULT_IMAGES.kitchen,
-    pool: images.pool ?? DEFAULT_IMAGES.pool,
-    agent: images.agent ?? DEFAULT_IMAGES.agent,
-  };
+const SiteCtx = createContext<SiteValue | null>(null);
+
+export function SiteProvider({
+  content,
+  openProperty,
+  children,
+}: {
+  content: SiteContent;
+  openProperty: (id: string) => void;
+  children: ReactNode;
+}) {
+  const value = useMemo(() => {
+    const number = content.agent.whatsappNumber;
+    const properties = content.properties.map((p) => resolveProperty(p, number));
+    const featuredId = getFeatured(content).id;
+    return {
+      content,
+      agent: resolveAgent(content.agent),
+      properties,
+      featured: properties.find((p) => p.id === featuredId) ?? properties[0]!,
+      openProperty,
+    };
+  }, [content, openProperty]);
+  return <SiteCtx.Provider value={value}>{children}</SiteCtx.Provider>;
 }
 
-type ListingValue = ResolvedListing & { imageSrc: Record<ImageSlot, string> };
-const ListingCtx = createContext<ListingValue | null>(null);
-
-export function ListingProvider({ content, children }: { content: ListingContent; children: ReactNode }) {
-  const value = useMemo(
-    () => ({ ...resolveListing(content), imageSrc: resolveImages(content.images) }),
-    [content],
-  );
-  return <ListingCtx.Provider value={value}>{children}</ListingCtx.Provider>;
-}
-
-export function useListing(): ListingValue {
-  const value = useContext(ListingCtx);
-  if (!value) throw new Error("useListing must be used inside <ListingProvider>");
+export function useSite(): SiteValue {
+  const value = useContext(SiteCtx);
+  if (!value) throw new Error("useSite must be used inside <SiteProvider>");
   return value;
 }

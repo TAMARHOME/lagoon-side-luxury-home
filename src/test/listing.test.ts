@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { defaultContent } from "@/config/listing";
 import {
+  amenityInfo,
   buildBookingMessage,
+  cleanContent,
+  duplicateProperty,
+  moveItem,
   buildWhatsAppUrl,
   filterProperties,
   getFeatured,
@@ -81,6 +85,66 @@ describe("saved admin content", () => {
   it("falls back to the first property when the featured one was deleted", () => {
     const [a, b] = defaultContent.properties;
     expect(mergeContent({ featuredId: "gone", properties: [b, a] }).featuredId).toBe(b!.id);
+  });
+});
+
+describe("website text, brand & footer", () => {
+  it("keeps the PrimeHaven name and Lagos footer location until the owner changes them", () => {
+    const { brand } = mergeContent(null).site;
+    expect(brand.name).toBe("PrimeHaven");
+    expect(brand.footerLocation).toBe("Lekki · Victoria Island · Ikoyi · Lagos, Nigeria");
+  });
+
+  it("uses the owner's website name and footer location once saved", () => {
+    const merged = mergeContent({ site: { brand: { name: "Tife Homes", footerLocation: "Ikeja, Lagos" } } });
+    expect(merged.site.brand.name).toBe("Tife Homes");
+    expect(merged.site.brand.footerLocation).toBe("Ikeja, Lagos");
+    expect(merged.site.hero.bookLabel).toBe(defaultContent.site.hero.bookLabel);
+  });
+
+  it("an empty website name falls back to the default instead of breaking the header", () => {
+    expect(mergeContent({ site: { brand: { name: "" } } }).site.brand.name).toBe("PrimeHaven");
+  });
+
+  it("hidden sections stay hidden", () => {
+    expect(mergeContent({ site: { video: { show: false } } }).site.video.show).toBe(false);
+  });
+
+  it("drops a broken review but keeps the good ones", () => {
+    const good = { quote: "Lovely stay", name: "Ada", detail: "" };
+    const merged = mergeContent({ site: { host: { testimonials: [{ quote: "", name: "" }, good] } } });
+    expect(merged.site.host.testimonials).toEqual([good]);
+  });
+
+  it("drops blank review and number rows when saving", () => {
+    const d = structuredClone(defaultContent);
+    d.site.host.testimonials.push({ quote: " ", name: "", detail: "" });
+    d.site.host.stats.push({ value: "", label: "" });
+    const c = cleanContent(d);
+    expect(c.site.host.testimonials).toHaveLength(2);
+    expect(c.site.host.stats).toHaveLength(3);
+  });
+
+  it("owner's amenity wording replaces the standard wording", () => {
+    expect(amenityInfo("wifi", [{ key: "wifi", label: "Fibre Internet", text: "1 Gbps" }])).toEqual({ key: "wifi", label: "Fibre Internet", text: "1 Gbps" });
+    expect(amenityInfo("wifi").label).toBe("Starlink Wi-Fi");
+  });
+});
+
+describe("listing manager", () => {
+  it("duplicating creates a separate new listing", () => {
+    const original = defaultContent.properties[0]!;
+    const copy = duplicateProperty(original, "copy-1");
+    expect(copy.id).toBe("copy-1");
+    expect(copy.status).toBe("new");
+    expect(copy.title).toBe(`${original.title} (copy)`);
+    copy.gallery.push({ url: "asset:pool", label: "x" });
+    expect(original.gallery).toHaveLength(4);
+  });
+
+  it("moves a listing up or down, never past the ends", () => {
+    expect(moveItem(["a", "b", "c"], 2, -1)).toEqual(["a", "c", "b"]);
+    expect(moveItem(["a", "b", "c"], 0, -1)).toEqual(["a", "b", "c"]);
   });
 });
 

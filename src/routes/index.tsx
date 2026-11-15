@@ -26,12 +26,18 @@ export const Route = createFileRoute("/")({
   head: ({ loaderData }) => {
     const featured = loaderData ? getFeatured(loaderData) : null;
     const count = loaderData?.properties.length ?? 0;
-    const title = featured
-      ? `${plainTitle(featured.title)}, ${shortLocation(featured.location)} | PrimeHaven Lagos`
-      : "Luxury Short-Lets & Homes in Lagos | PrimeHaven Lagos";
-    const description = featured
+    const brand = loaderData ? [loaderData.site.brand.name, loaderData.site.brand.tagline].filter(Boolean).join(" ") : "PrimeHaven Lagos";
+    const seo = loaderData?.site.seo;
+    const title =
+      seo?.title ||
+      (featured
+        ? `${plainTitle(featured.title)}, ${shortLocation(featured.location)} | ${brand}`
+        : `Luxury Short-Lets & Homes in Lagos | ${brand}`);
+    const description =
+      seo?.description ||
+      (featured
       ? `Browse ${count} luxury short-lets and homes for sale in Lagos, featuring the ${plainTitle(featured.title)} in ${featured.location}. Watch video tours and book on WhatsApp.`
-      : "Browse luxury short-lets and homes for sale in Lekki, Victoria Island and Ikoyi. Watch video tours and book on WhatsApp.";
+      : "Browse luxury short-lets and homes for sale in Lekki, Victoria Island and Ikoyi. Watch video tours and book on WhatsApp.");
     return {
       meta: [
         { title },

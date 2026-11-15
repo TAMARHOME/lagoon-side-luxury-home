@@ -42,7 +42,13 @@ export const AMENITIES = [
 ] as const;
 export type AmenityKey = (typeof AMENITIES)[number]["key"];
 const AMENITY_KEYS = AMENITIES.map((a) => a.key) as [AmenityKey, ...AmenityKey[]];
-export const amenityInfo = (key: AmenityKey) => AMENITIES.find((a) => a.key === key)!;
+export type AmenityText = { key: AmenityKey; label: string; text: string };
+/** Built-in amenity wording, replaced by the owner's own wording when they set it. */
+export function amenityInfo(key: AmenityKey, overrides: readonly AmenityText[] = []): AmenityText {
+  const base = AMENITIES.find((a) => a.key === key)!;
+  const own = overrides.find((o) => o.key === key);
+  return own ? { key, label: own.label || base.label, text: own.text } : { key, label: base.label, text: base.text };
+}
 
 export const CATEGORY_LABELS = { "short-let": "Short-Let", sale: "For Sale" } as const;
 export type PropertyCategory = keyof typeof CATEGORY_LABELS;
@@ -74,6 +80,7 @@ export type Property = z.infer<typeof propertySchema>;
 export const agentSchema = z.object({
   agencyName: z.string().trim().min(1, "Add the agency name").max(80),
   name: z.string().trim().min(1, "Add the agent's name").max(80),
+  role: z.string().trim().max(60),
   bio: z.string().trim().max(400),
   whatsappNumber: z
     .string()
@@ -84,8 +91,57 @@ export const agentSchema = z.object({
 });
 export type Agent = z.infer<typeof agentSchema>;
 
+const text = (max: number) => z.string().trim().max(max);
+const required = (max: number, message: string) => z.string().trim().min(1, message).max(max);
+
+export const MAX_STATS = 4;
+export const MAX_TESTIMONIALS = 6;
+
+/** Website-wide wording, brand and footer. Titles accept *stars* for gold words. */
+export const siteSchema = z.object({
+  brand: z.object({
+    name: required(40, "Add the website name"),
+    tagline: text(30),
+    footerLocation: text(120),
+    copyright: text(120),
+    enquiryMessage: required(200, "Add the WhatsApp greeting"),
+  }),
+  seo: z.object({ title: text(70), description: text(170) }),
+  hero: z.object({
+    badge: text(40),
+    bookLabel: required(40, "Add the booking button text"),
+    detailsLabel: required(40, "Add the details button text"),
+    chatLabel: required(30, "Add the mobile button text"),
+  }),
+  catalog: z.object({ eyebrow: text(40), title: required(80, "Add a heading"), intro: text(240) }),
+  video: z.object({ show: z.boolean(), eyebrow: text(40), title: required(80, "Add a heading"), caption: text(240) }),
+  gallery: z.object({ show: z.boolean(), eyebrow: text(40), title: required(80, "Add a heading"), intro: text(240) }),
+  amenities: z.object({ show: z.boolean(), eyebrow: text(40), title: required(80, "Add a heading") }),
+  host: z.object({
+    show: z.boolean(),
+    eyebrow: text(40),
+    title: required(80, "Add a heading"),
+    badge: text(30),
+    stats: z.array(z.object({ value: required(12, "Add a number"), label: required(40, "Add a label") })).max(MAX_STATS),
+    testimonials: z
+      .array(z.object({ quote: required(400, "Add the review"), name: required(60, "Add the guest's name"), detail: text(80) }))
+      .max(MAX_TESTIMONIALS),
+  }),
+  footer: z.object({
+    eyebrow: text(40),
+    title: required(100, "Add a heading"),
+    subline: text(160),
+    ctaLabel: required(40, "Add the button text"),
+  }),
+  amenityText: z
+    .array(z.object({ key: z.enum(AMENITY_KEYS), label: required(40, "Add a name"), text: text(160) }))
+    .max(AMENITIES.length),
+});
+export type SiteSettings = z.infer<typeof siteSchema>;
+
 export const siteContentSchema = z
   .object({
+    site: siteSchema,
     agent: agentSchema,
     featuredId: z.string().max(48).nullable(),
     properties: z.array(propertySchema).min(1, "Keep at least one property").max(MAX_PROPERTIES),
@@ -101,16 +157,32 @@ export type SiteContent = z.infer<typeof siteContentSchema>;
 
 const isObj = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
-/** Overlays saved content on the defaults; invalid agent fields keep their default, invalid properties are skipped. */
+/** Field-by-field overlay: anything missing or invalid keeps its default; bad list items are dropped. */
+function mergeObject<T>(schema: z.AnyZodObject, input: unknown, fallback: T): T {
+  const src = isObj(input) ? input : {};
+  const fb = fallback as Record<string, unknown>;
+  const out: Record<string, unknown> = {};
+  for (const [key, field] of Object.entries(schema.shape as z.ZodRawShape)) {
+    if (field instanceof z.ZodObject) {
+      out[key] = mergeObject(field, src[key], fb[key]);
+      continue;
+    }
+    let value: unknown = key in src ? src[key] : fb[key];
+    if (field instanceof z.ZodArray && Array.isArray(value)) {
+      const element = field.element as z.ZodTypeAny;
+      value = value.filter((item) => element.safeParse(item).success);
+    }
+    const parsed = field.safeParse(value);
+    out[key] = parsed.success ? parsed.data : fb[key];
+  }
+  return out as T;
+}
+
+/** Overlays saved content on the defaults; invalid fields keep their default, invalid properties are skipped. */
 export function mergeContent(saved: unknown): SiteContent {
   const s = isObj(saved) ? saved : {};
-  const agentIn = isObj(s["agent"]) ? s["agent"] : {};
-  const agent: Record<string, unknown> = {};
-  for (const key of Object.keys(agentSchema.shape) as (keyof Agent)[]) {
-    const fallback = defaultContent.agent[key];
-    const parsed = agentSchema.shape[key].safeParse(key in agentIn ? agentIn[key] : fallback);
-    agent[key] = parsed.success ? parsed.data : fallback;
-  }
+  const agent = mergeObject<Agent>(agentSchema, s["agent"], defaultContent.agent);
+  const site = mergeObject<SiteSettings>(siteSchema, s["site"], defaultContent.site);
 
   const ids = new Set<string>();
   const saveds = Array.isArray(s["properties"]) ? s["properties"] : [];
@@ -129,7 +201,7 @@ export function mergeContent(saved: unknown): SiteContent {
       ? (s["featuredId"] as string)
       : properties[0]!.id;
 
-  return { agent: agent as Agent, featuredId, properties };
+  return { site, agent, featuredId, properties };
 }
 
 export function getFeatured(content: SiteContent): Property {
@@ -179,7 +251,6 @@ export function buildWhatsAppUrl(number: string, message: string): string {
   return `https://wa.me/${number.replace(/\D/g, "")}?text=${encodeURIComponent(message)}`;
 }
 
-export const GENERAL_ENQUIRY_MESSAGE = "Hello, I am interested in your Lagos properties";
 
 export const interestMessage = (title: string) => `Hello, I am interested in the ${plainTitle(title)}`;
 
@@ -207,6 +278,37 @@ export const defaultVisitType = (category: PropertyCategory): VisitType =>
   category === "sale" ? "Physical Inspection" : "Short-Let Booking";
 
 /* ---------- Admin helpers ---------- */
+
+/** Copy of a listing for "Duplicate", saved as a new listing. */
+export function duplicateProperty(p: Property, id: string): Property {
+  return { ...structuredClone(p), id, title: `${p.title} (copy)`.slice(0, 120), status: "new" };
+}
+
+/** Moves the item at `from` one place up (-1) or down (+1). */
+export function moveItem<T>(list: T[], from: number, dir: -1 | 1): T[] {
+  const to = from + dir;
+  if (to < 0 || to >= list.length) return list;
+  const next = [...list];
+  [next[from], next[to]] = [next[to]!, next[from]!];
+  return next;
+}
+
+/** Drops half-filled rows so the form still saves. */
+export function cleanContent(d: SiteContent): SiteContent {
+  const host = d.site.host;
+  return {
+    ...d,
+    site: {
+      ...d.site,
+      host: {
+        ...host,
+        stats: host.stats.filter((x) => x.value.trim() || x.label.trim()),
+        testimonials: host.testimonials.filter((t) => t.quote.trim() || t.name.trim() || t.detail.trim()),
+      },
+    },
+    properties: d.properties.map((p) => ({ ...p, landmarks: p.landmarks.map((l) => l.trim()).filter(Boolean) })),
+  };
+}
 
 export function blankProperty(id: string): Property {
   return {

@@ -30,7 +30,7 @@ use the editor.
 <!-- LOVABLE:END -->
 
 ## Project rules
-- Site content (global agent + properties array + featuredId) is one JSONB row in `site_content`, edited via `/admin` and validated by `siteContentSchema`/`mergeContent` in `src/lib/listing-content.ts`; `src/config/listing.ts` holds only defaults and non-editable copy, so saved data never breaks the page.
+- Site content (website `site` wording/brand/footer settings + global agent + properties array + featuredId) is one JSONB row in `site_content`, edited via `/admin` tabs and validated by `siteContentSchema`; `mergeContent` overlays it field-by-field on the defaults in `src/config/listing.ts`, so saved data never breaks the page. Public sections must read visible text from `useSite().site`, never hardcode it.
 - The property detail view is driven by the `?property=<id>` search param on `/` so detail links are shareable.
 - Video tour source is auto-detected by `resolveVideoSource` in `src/lib/video-source.ts` (MP4 / YouTube / Instagram / TikTok); add new providers there, covered by `src/test/listing.test.ts`.
 - Page sections live in `src/components/listing/`; styling uses tokens/utilities in `src/styles.css` and `gold`/`goldOutline` Button variants, never raw colors.

@@ -16,13 +16,13 @@ import {
   STATUS_LABELS,
   amenityInfo,
   buildWhatsAppUrl,
-  GENERAL_ENQUIRY_MESSAGE,
   interestMessage,
   parseTitle,
   plainTitle,
   shortLocation,
   splitPrice,
   type Agent,
+  type AmenityText,
   type Property,
 } from "./listing-content";
 
@@ -52,9 +52,9 @@ export function resolveImage(ref: string | null | undefined): string | null {
   return ref;
 }
 
-export function resolveProperty(p: Property, whatsappNumber: string) {
+export function resolveProperty(p: Property, whatsappNumber: string, amenityText: readonly AmenityText[] = []) {
   const { label, unit } = splitPrice(p.price);
-  const amenities = p.amenities.map(amenityInfo);
+  const amenities = p.amenities.map((key) => amenityInfo(key, amenityText));
   return {
     ...p,
     titleParts: parseTitle(p.title),
@@ -74,12 +74,12 @@ export function resolveProperty(p: Property, whatsappNumber: string) {
 }
 export type ResolvedProperty = ReturnType<typeof resolveProperty>;
 
-export function resolveAgent(a: Agent) {
+export function resolveAgent(a: Agent, enquiryMessage: string) {
   return {
     ...a,
     photoSrc: resolveImage(a.photo) ?? DEFAULT_AGENT_PHOTO,
     firstName: a.name.split(" ")[0] ?? a.name,
-    enquiryUrl: buildWhatsAppUrl(a.whatsappNumber, GENERAL_ENQUIRY_MESSAGE),
+    enquiryUrl: buildWhatsAppUrl(a.whatsappNumber, enquiryMessage),
   };
 }
 export type ResolvedAgent = ReturnType<typeof resolveAgent>;

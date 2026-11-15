@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { PropertyCard } from "@/components/listing/PropertyCard";
 import { WhatsAppIcon } from "@/components/listing/WhatsAppIcon";
 import { resolveProperty } from "@/lib/listing-assets";
-import { AMENITIES, MAX_GALLERY, MAX_LANDMARKS, STATUS_LABELS, type AmenityKey, type Property, type PropertyStatus } from "@/lib/listing-content";
+import { AMENITIES, amenityInfo, MAX_GALLERY, MAX_LANDMARKS, STATUS_LABELS, type AmenityKey, type AmenityText, type Property, type PropertyStatus } from "@/lib/listing-content";
 import { resolveVideoSource } from "@/lib/video-source";
 import { cn } from "@/lib/utils";
 import { Field, Section, Segmented } from "./form-parts";
@@ -21,6 +21,7 @@ type Props = {
   /** Validation messages keyed by field path within this property, e.g. "title", "gallery.0.url". */
   errors: Record<string, string>;
   whatsappNumber: string;
+  amenityText: readonly AmenityText[];
   isFeatured: boolean;
   canDelete: boolean;
   onChange: (patch: Partial<Property>) => void;
@@ -29,7 +30,7 @@ type Props = {
   onBack: () => void;
 };
 
-export function PropertyEditor({ property: p, isNew, errors, whatsappNumber, isFeatured, canDelete, onChange, onFeature, onDelete, onBack }: Props) {
+export function PropertyEditor({ property: p, isNew, errors, whatsappNumber, amenityText, isFeatured, canDelete, onChange, onFeature, onDelete, onBack }: Props) {
   const setVideo = (patch: Partial<Property["video"]>) => onChange({ video: { ...p.video, ...patch } });
   const fid = (name: string) => `${p.id}-${name}`;
 
@@ -45,13 +46,13 @@ export function PropertyEditor({ property: p, isNew, errors, whatsappNumber, isF
   const toggleAmenity = (key: AmenityKey, on: boolean) =>
     onChange({ amenities: on ? AMENITIES.map((a) => a.key).filter((k) => k === key || p.amenities.includes(k)) : p.amenities.filter((k) => k !== key) });
 
-  const preview = resolveProperty(p, whatsappNumber);
+  const preview = resolveProperty(p, whatsappNumber, amenityText);
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" size="sm" className="rounded-full text-muted-foreground" onClick={onBack}>
-          <ArrowLeft /> All properties
+          <ArrowLeft /> All listings
         </Button>
         <div className="flex flex-wrap items-center gap-2">
           <Button variant={isFeatured ? "gold" : "goldOutline"} size="sm" className="rounded-full" onClick={onFeature} disabled={isFeatured}>
@@ -64,7 +65,7 @@ export function PropertyEditor({ property: p, isNew, errors, whatsappNumber, isF
       </div>
 
       <h2 className="mt-6 font-display text-4xl text-foreground md:text-5xl">
-        {isNew ? "Add a new property" : <>Edit <span className="italic text-gold">{preview.plainTitle || "property"}</span></>}
+        {isNew ? "Create a new listing" : <>Edit <span className="italic text-gold">{preview.plainTitle || "property"}</span></>}
       </h2>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px]">
@@ -184,7 +185,7 @@ export function PropertyEditor({ property: p, isNew, errors, whatsappNumber, isF
                     )}
                   >
                     <Checkbox checked={checked} onCheckedChange={(v) => toggleAmenity(a.key, v === true)} />
-                    {a.label}
+                    {amenityInfo(a.key, amenityText).label}
                   </label>
                 );
               })}

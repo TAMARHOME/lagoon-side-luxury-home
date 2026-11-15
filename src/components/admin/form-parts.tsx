@@ -91,3 +91,12 @@ export function Segmented<T extends string>({
     </div>
   );
 }
+
+/** Errors under `prefix`, re-keyed relative to it ("site.hero.bookLabel" → "bookLabel"). */
+export function scopedErrors(errors: Record<string, string>, prefix: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(errors)) if (k.startsWith(prefix)) out[k.slice(prefix.length)] = v;
+  return out;
+}
+
+export const GOLD_HINT = "Wrap a word in *stars* to show it in gold italics.";

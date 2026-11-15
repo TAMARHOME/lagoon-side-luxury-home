@@ -1,6 +1,6 @@
 import { BadgeCheck, Quote, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { staticListing } from "@/config/listing";
+import { cn } from "@/lib/utils";
 import { useSite } from "./ListingContext";
 import { SectionHeading } from "./SectionHeading";
 import { WhatsAppIcon } from "./WhatsAppIcon";
@@ -16,41 +16,45 @@ function Stars() {
 }
 
 export function HostTrust() {
-  const { agent } = useSite();
-  const { stats, testimonials, agentRole } = staticListing;
+  const { agent, site } = useSite();
+  const { stats, testimonials, badge } = site.host;
+  if (!site.host.show) return null;
+  const roleLine = [agent.name, agent.role].filter(Boolean).join(" · ");
   return (
     <section id="host" className="px-5 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="Your Host" title={<>Hosted with <span className="italic text-gold">discretion.</span></>} />
+        <SectionHeading eyebrow={site.host.eyebrow} title={site.host.title} />
 
         <div className="mt-12 grid gap-4 lg:grid-cols-5">
-          <div className="overflow-hidden rounded-3xl border border-border bg-card-gradient shadow-card lg:col-span-3">
+          <div className={cn("overflow-hidden rounded-3xl border border-border bg-card-gradient shadow-card", testimonials.length > 0 ? "lg:col-span-3" : "lg:col-span-5")}>
             <div className="grid sm:grid-cols-5">
               <div className="relative aspect-[4/5] sm:col-span-2 sm:aspect-auto">
-                <img src={agent.photoSrc} alt={`${agent.name}, ${agentRole}`} loading="lazy" width={768} height={960} className="absolute inset-0 h-full w-full object-cover object-top" />
+                <img src={agent.photoSrc} alt={roleLine} loading="lazy" width={768} height={960} className="absolute inset-0 h-full w-full object-cover object-top" />
               </div>
               <div className="flex flex-col justify-between gap-8 p-6 sm:col-span-3 md:p-10">
                 <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-[0.65rem] font-bold tracking-[0.2em] text-primary-foreground">
-                    <BadgeCheck className="h-3.5 w-3.5" /> VERIFIED HOST
-                  </span>
-                  <h3 className="mt-5 font-display text-3xl text-foreground md:text-4xl">{agent.agencyName}</h3>
+                  {badge && (
+                    <span className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-[0.65rem] font-bold uppercase tracking-[0.2em] text-primary-foreground">
+                      <BadgeCheck className="h-3.5 w-3.5" /> {badge}
+                    </span>
+                  )}
+                  <h3 className=" font-display text-3xl text-foreground md:text-4xl">{agent.agencyName}</h3>
                   <p className="mt-1 text-sm text-primary">
-                    {agent.name} · {agentRole}
+                    {roleLine}
                   </p>
                   <p className="mt-4 leading-relaxed text-muted-foreground">{agent.bio}</p>
                 </div>
                 <div>
                   <div className="gold-rule" />
-                  <dl className="mt-6 grid grid-cols-3 gap-4">
-                    {stats.map((s) => (
-                      <div key={s.label}>
+                  {stats.length > 0 && <dl className={cn("mt-6 grid gap-4", stats.length === 4 ? "grid-cols-2 sm:grid-cols-4" : stats.length === 3 ? "grid-cols-3" : "grid-cols-2")}>
+                    {stats.map((s, i) => (
+                      <div key={`${i}-${s.label}`}>
                         <dt className="sr-only">{s.label}</dt>
                         <dd className="font-display text-3xl text-gold">{s.value}</dd>
                         <dd className="mt-1 text-xs text-muted-foreground">{s.label}</dd>
                       </div>
                     ))}
-                  </dl>
+                  </dl>}
                   <Button asChild variant="goldOutline" size="pill" className="mt-8">
                     <a href={agent.enquiryUrl} target="_blank" rel="noopener noreferrer">
                       <WhatsAppIcon /> Message {agent.firstName}
@@ -61,9 +65,9 @@ export function HostTrust() {
             </div>
           </div>
 
-          <div className="grid gap-4 lg:col-span-2">
-            {testimonials.map((t) => (
-              <figure key={t.name} className="relative flex flex-col justify-between rounded-3xl border border-border bg-card p-6 md:p-8">
+          {testimonials.length > 0 && <div className="grid gap-4 lg:col-span-2">
+            {testimonials.map((t, i) => (
+              <figure key={`${i}-${t.name}`} className="relative flex flex-col justify-between rounded-3xl border border-border bg-card p-6 md:p-8">
                 <Quote className="absolute right-6 top-6 h-8 w-8 text-primary/25" />
                 <div>
                   <Stars />
@@ -82,7 +86,7 @@ export function HostTrust() {
                 </figcaption>
               </figure>
             ))}
-          </div>
+          </div>}
         </div>
       </div>
     </section>

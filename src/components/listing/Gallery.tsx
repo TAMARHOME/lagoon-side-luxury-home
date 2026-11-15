@@ -6,7 +6,7 @@ import { SectionHeading } from "./SectionHeading";
 
 /** Photo gallery of the featured property, with a full-screen lightbox. */
 export function Gallery() {
-  const { featured } = useSite();
+  const { featured, site } = useSite();
   const photos = featured.photos;
   const [open, setOpen] = useState<number | null>(null);
   const close = useCallback(() => setOpen(null), []);
@@ -28,14 +28,14 @@ export function Gallery() {
     };
   }, [open, close, step]);
 
-  if (photos.length === 0) return null;
+  if (photos.length === 0 || !site.gallery.show) return null;
   const current = open === null ? undefined : photos[open];
 
   return (
     <section id="gallery" className="px-5 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="The Residence" title={<>Every room, <span className="italic text-gold">curated.</span></>}>
-          Tap any photo to view it full-screen.
+        <SectionHeading eyebrow={site.gallery.eyebrow} title={site.gallery.title}>
+          {site.gallery.intro}
         </SectionHeading>
 
         <div className="mt-12 grid grid-cols-2 gap-3 md:auto-rows-[230px] md:grid-cols-4 md:gap-4">

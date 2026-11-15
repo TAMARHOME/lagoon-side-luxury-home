@@ -4,7 +4,7 @@ import { WhatsAppIcon } from "./WhatsAppIcon";
 
 /** Frosted bottom bar on phones: featured price + WhatsApp. */
 export function MobileActionBar() {
-  const { featured } = useSite();
+  const { featured, site } = useSite();
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 border-t glass pb-[env(safe-area-inset-bottom)] md:hidden">
       <div className="flex items-center justify-between gap-4 px-5 py-3">
@@ -18,7 +18,7 @@ export function MobileActionBar() {
         </div>
         <Button asChild variant="gold" size="pill" className="shrink-0">
           <a href={featured.interestUrl} target="_blank" rel="noopener noreferrer">
-            <WhatsAppIcon /> Chat on WhatsApp
+            <WhatsAppIcon /> {site.hero.chatLabel}
           </a>
         </Button>
       </div>

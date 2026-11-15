@@ -29,7 +29,7 @@ function Pill({ active, onClick, children, small }: { active: boolean; onClick: 
 }
 
 export function PropertiesCatalog() {
-  const { properties, openProperty } = useSite();
+  const { properties, openProperty, site } = useSite();
   const [category, setCategory] = useState<CategoryFilter>("all");
   const [area, setArea] = useState<string | null>(null);
   const areas = listAreas(properties);
@@ -38,8 +38,8 @@ export function PropertiesCatalog() {
   return (
     <section id="properties" className="px-5 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="The Collection" title={<>Available Properties <span className="italic text-gold">&amp; Short-Lets</span></>}>
-          Handpicked residences across Lagos. Tap any home for photos, a video walkthrough and instant booking.
+        <SectionHeading eyebrow={site.catalog.eyebrow} title={site.catalog.title}>
+          {site.catalog.intro}
         </SectionHeading>
 
         <div className="mt-10 flex gap-2 overflow-x-auto pb-1">

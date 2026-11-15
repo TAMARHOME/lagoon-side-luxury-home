@@ -1,15 +1,77 @@
 /**
- * Default site content. The owner normally edits everything through /admin
- * (saved online); these values are only used until something is saved there.
+ * Default site content. The owner edits everything through /admin (saved
+ * online); these values are only used for anything not saved there yet.
  * Photos written as "asset:<name>" are the ones that ship with the site
  * (see src/lib/listing-assets.ts).
  */
 import type { SiteContent } from "@/lib/listing-content";
 
 export const defaultContent: SiteContent = {
+  site: {
+    brand: {
+      name: "PrimeHaven",
+      tagline: "Lagos",
+      footerLocation: "Lekki · Victoria Island · Ikoyi · Lagos, Nigeria",
+      copyright: "",
+      enquiryMessage: "Hello, I am interested in your Lagos properties",
+    },
+    seo: { title: "", description: "" },
+    hero: {
+      badge: "Featured Listing",
+      bookLabel: "Book Inspection / Reserve",
+      detailsLabel: "View Details & Video",
+      chatLabel: "Chat on WhatsApp",
+    },
+    catalog: {
+      eyebrow: "The Collection",
+      title: "Available Properties *& Short-Lets*",
+      intro: "Handpicked residences across Lagos. Tap any home for photos, a video walkthrough and instant booking.",
+    },
+    video: {
+      show: true,
+      eyebrow: "Virtual Viewing",
+      title: "Property Walkthrough *& Video Tour*",
+      caption: "Take a 2-minute virtual walkthrough of the interior, compound, and neighborhood",
+    },
+    gallery: { show: true, eyebrow: "The Residence", title: "Every room, *curated.*", intro: "Tap any photo to view it full-screen." },
+    amenities: { show: true, eyebrow: "Amenities & Specs", title: "Built for *effortless* living." },
+    host: {
+      show: true,
+      eyebrow: "Your Host",
+      title: "Hosted with *discretion.*",
+      badge: "Verified Host",
+      stats: [
+        { value: "120+", label: "Luxury stays hosted" },
+        { value: "4.9", label: "Guest rating" },
+        { value: "8 yrs", label: "In Lagos real estate" },
+      ],
+      testimonials: [
+        {
+          quote:
+            "Spotless, secure and the power never blinked once. Check-in was seamless — easily the best short-let I've booked in Lekki.",
+          name: "Tunde A.",
+          detail: "Business stay • 5 nights",
+        },
+        {
+          quote:
+            "The pool, the Starlink, the view — exactly as shown in the video. PrimeHaven responded on WhatsApp within minutes.",
+          name: "Chioma E.",
+          detail: "Family getaway • 3 nights",
+        },
+      ],
+    },
+    footer: {
+      eyebrow: "Limited Availability",
+      title: "Find your next address in *Lagos.*",
+      subline: "Instant replies on WhatsApp",
+      ctaLabel: "Chat on WhatsApp",
+    },
+    amenityText: [],
+  },
   agent: {
     agencyName: "PrimeHaven Properties Lagos",
     name: "Adaeze Okafor",
+    role: "Lead Property Consultant",
     bio: "Trusted luxury short-let and property specialists in Lekki & Victoria Island",
     whatsappNumber: "2348000000000",
     photo: null,
@@ -82,28 +144,3 @@ export const defaultContent: SiteContent = {
     },
   ],
 };
-
-/** Content that is not editable from /admin. */
-export const staticListing = {
-  videoCaption: "Take a 2-minute virtual walkthrough of the interior, compound, and neighborhood",
-  agentRole: "Lead Property Consultant",
-  stats: [
-    { value: "120+", label: "Luxury stays hosted" },
-    { value: "4.9", label: "Guest rating" },
-    { value: "8 yrs", label: "In Lagos real estate" },
-  ],
-  testimonials: [
-    {
-      quote:
-        "Spotless, secure and the power never blinked once. Check-in was seamless — easily the best short-let I've booked in Lekki.",
-      name: "Tunde A.",
-      detail: "Business stay • 5 nights",
-    },
-    {
-      quote:
-        "The pool, the Starlink, the view — exactly as shown in the video. PrimeHaven responded on WhatsApp within minutes.",
-      name: "Chioma E.",
-      detail: "Family getaway • 3 nights",
-    },
-  ],
-} as const;

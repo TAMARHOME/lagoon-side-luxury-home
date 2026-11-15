@@ -4,12 +4,12 @@ import { SectionHeading } from "./SectionHeading";
 
 /** Amenities of the featured property. */
 export function Amenities() {
-  const { featured } = useSite();
-  if (featured.amenityList.length === 0) return null;
+  const { featured, site } = useSite();
+  if (featured.amenityList.length === 0 || !site.amenities.show) return null;
   return (
     <section id="amenities" className="px-5 py-20 md:px-10 md:py-28">
       <div className="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="Amenities & Specs" title={<>Built for <span className="italic text-gold">effortless</span> living.</>} />
+        <SectionHeading eyebrow={site.amenities.eyebrow} title={site.amenities.title} />
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.amenityList.map(({ key, label, text }) => {
             const Icon = AMENITY_ICONS[key];

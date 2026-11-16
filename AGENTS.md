@@ -34,3 +34,4 @@ use the editor.
 - The property detail view is driven by the `?property=<id>` search param on `/` so detail links are shareable.
 - Video tour source is auto-detected by `resolveVideoSource` in `src/lib/video-source.ts` (MP4 / YouTube / Instagram / TikTok); add new providers there, covered by `src/test/listing.test.ts`.
 - Page sections live in `src/components/listing/`; styling uses tokens/utilities in `src/styles.css` and `gold`/`goldOutline` Button variants, never raw colors.
+- Listing photos live in the private `listing-media` bucket with no client read policy; they are served only through `/api/public/media/$` which validates the path with `MEDIA_PATH_PATTERN` and downloads server-side — keeps the bucket from being listed.
